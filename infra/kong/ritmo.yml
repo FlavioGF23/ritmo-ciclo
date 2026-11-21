@@ -1,0 +1,51 @@
+_format_version: "3.0"
+_transform: true
+
+routes:
+  - name: identity-admin-blocked
+    paths:
+      - /auth/admin
+      - /auth/realms/master
+    plugins:
+      - name: request-termination
+        config:
+          status_code: 404
+
+services:
+  - name: ciclo-api
+    url: http://api:8000
+    retries: 0
+    routes:
+      - name: ciclo-json
+        paths: [/api]
+        strip_path: false
+        protocols: [https]
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 120
+          policy: local
+          limit_by: ip
+          hide_client_headers: true
+  - name: identidad
+    url: http://keycloak:8080
+    retries: 0
+    routes:
+      - name: keycloak-oidc
+        paths: [/auth]
+        strip_path: false
+        protocols: [https]
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 180
+          policy: local
+          limit_by: ip
+          hide_client_headers: true
+  - name: interfaz
+    url: http://frontend:8080
+    routes:
+      - name: ritmo-web
+        paths: [/]
+        strip_path: false
+        protocols: [https]

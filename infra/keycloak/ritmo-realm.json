@@ -1,0 +1,54 @@
+{
+  "realm": "ritmo",
+  "displayName": "Ritmo",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "bruteForceProtected": true,
+  "failureFactor": 6,
+  "defaultLocale": "es",
+  "supportedLocales": ["es"],
+  "internationalizationEnabled": true,
+  "accessTokenLifespan": 300,
+  "passwordPolicy": "length(12) and notUsername and passwordHistory(3)",
+  "clients": [
+    {
+      "clientId": "ritmo-web",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["${APP_ORIGIN}/"],
+      "webOrigins": ["${APP_ORIGIN}"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "${APP_ORIGIN}/"
+      },
+      "protocolMappers": [
+        {
+          "name": "API audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "ritmo-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "ritmo-account-cleanup",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "${KEYCLOAK_CLEANUP_SECRET}",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "fullScopeAllowed": true
+    }
+  ]
+}
